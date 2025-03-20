@@ -1668,6 +1668,7 @@ type TooManyRequests struct {
 // UnmarshalJSON helps support translation of a milliseconds-based float
 // into a time.Duration on TooManyRequests.
 func (t *TooManyRequests) UnmarshalJSON(b []byte) error {
+	fmt.Println("Raw 429 response:", string(b))
 	u := struct {
 		Bucket     string  `json:"bucket"`
 		Message    string  `json:"message"`
@@ -1682,6 +1683,8 @@ func (t *TooManyRequests) UnmarshalJSON(b []byte) error {
 	t.Message = u.Message
 	whole, frac := math.Modf(u.RetryAfter)
 	t.RetryAfter = time.Duration(whole)*time.Second + time.Duration(frac*1000)*time.Millisecond
+
+	fmt.Println(`"retry_after" float64 to time.Duration conversion:`, t.RetryAfter)
 	return nil
 }
 
